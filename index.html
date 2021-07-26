@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space War</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <img src="./assets/images/spaceship.png" id="spaceshipImg" class="hide">
+    <img src="./assets/images/alien1.png" id="alienImg" class="hide">
+
+    <div id="wrapper">
+        <div id="game">
+            <div id="navs">
+                <div id="scoresDiv">
+                    <div id="score">Score - 0</div>
+                    <div id="kill">Kills - 0</div>
+                    <div id="level">Level - 1</div>
+                </div>
+
+                <div id="pauseDiv">
+                    <button id="pause">New Game</button>
+                </div>
+            </div>
+            <div id="gameArea">
+                <div id="levelCanvas" class="hide">Level - 1</div>
+                <canvas id="canvas" class=""></canvas>
+            </div>
+        </div>
+
+        <div id="bottom-container">
+            <div id="navContent">
+                <div id="nameDiv">
+                    <div id="nameLabelDiv">
+                        <label for="yourName">Enter your name: </label>
+                        <input type="text" id="yourName">
+                    </div>
+                    <div id="newGameDiv"><button id="newGame">New Game</button></div>
+                </div>
+                <div id="highscoreDiv">
+                    <table id="highscore">
+                        <tr>
+                            <td>Player's Name</td>
+                            <td>High Score</td>
+                        </tr>
+                        <tr>
+                            <td><span id="highName">N/A</span></td>
+                            <td><span id="highScore">-</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
