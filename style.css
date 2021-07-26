@@ -86,6 +86,24 @@ body {
     position: relative;
 }
 
+#popup {
+    background-color: rgba(207, 206, 206, 0.5);
+    pointer-events: all;
+    text-align: center;
+    height: 100px;
+    position: absolute;
+    width: 100%;
+    top: 40%;
+    color: white;
+}
+
+#popupText {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 #canvas {
     box-shadow: 0 0 10px 3px #bac5f3;
     border-radius: 10px;
@@ -154,6 +172,12 @@ table tr:first-child td:first-child {
 
 table tr:first-child td:last-child {
     border-top-right-radius: 10px;
+}
+
+.disabled {
+    pointer-events: none;
+    background-color: #a1a1a191;
+    opacity: 0.5;
 }
 
 .hide {

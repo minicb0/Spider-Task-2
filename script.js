@@ -15,6 +15,8 @@ var input = document.getElementById('yourName');
 var newGame = document.getElementById('newGame');
 var highScore = document.getElementById('highScore');
 var highName = document.getElementById('highName');
+var popup = document.getElementById("popup");
+var popupText = document.getElementById('popupText');
 
 // default size
 var spaceshipSize = 75;
@@ -54,6 +56,8 @@ var movingUp = false;
 var movingDown = false;
 var movingLeft = false;
 var movingRight = false;
+popupText.innerHTML = `Click New Game Button to start the game!`;
+canvas.classList.add('disabled');
 
 //local Storage
 var scoreLocal;
@@ -348,9 +352,14 @@ pause.addEventListener('click', () => {
     if (pause.innerHTML == "Pause") {
         pause.innerHTML = "Play"
         cancelAnimationFrame(requestID);
+        popupText.innerHTML = `The game is being paused! <br> To continue, press Play button`;
+        popup.classList.remove('hide');
+        canvas.classList.add('disabled');
     } else if (pause.innerHTML == "Play") {
         pause.innerHTML = "Pause"
         requestID = requestAnimationFrame(animate);
+        popup.classList.add('hide');
+        canvas.classList.remove('disabled');
     } else if (pause.innerHTML == "New Game") {
         newGameFunc();
     }
@@ -360,9 +369,14 @@ pause.addEventListener('click', () => {
 function gameOver() {
     pause.innerHTML = "New Game";
     input.disabled = false;
+    popupText.innerHTML = `Hey ${nameDisplay}! <br> The games over! <br> Your Score: ${score}`;
+    popup.classList.remove('hide');
+    canvas.classList.add('disabled');
 }
 
 function newGameFunc() {
+    popup.classList.add('hide');
+    canvas.classList.remove('disabled');
     nameDisplay = input.value;
     input.disabled = true;
     pause.innerHTML = "Pause";
