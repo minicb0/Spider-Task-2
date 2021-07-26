@@ -18,6 +18,21 @@ var highName = document.getElementById('highName');
 var popup = document.getElementById("popup");
 var popupText = document.getElementById('popupText');
 
+// audio switch on/off variables
+var mute = document.getElementById('muteImg')
+var unmute = document.getElementById('unmuteImg')
+var musicOn = document.getElementById('musicOnImg')
+var musicOff = document.getElementById('musicOffImg')
+
+// audio
+var shootSound = new Audio('./assets/audio/shoot.mp3');
+var enemyDieSound = new Audio('./assets/audio/enemyDie.mp3');
+var levelUpSound = new Audio('./assets/audio/levelUp.mp3');
+var gameOverSound = new Audio('./assets/audio/gameOver.mp3');
+var clickSound = new Audio('./assets/audio/click.mp3');
+var backgroundSound = new Audio('./assets/audio/background.mp3');
+backgroundSound.loop = true;
+
 // default size
 var spaceshipSize = 75;
 var enemySize = 50;
@@ -170,6 +185,7 @@ function spawnEnemy() {
     setInterval(() => {
         if (totalEnemies > 3) {
             if (enemies.length == 0) {
+                levelUpSound.play();
                 count += 200
                 level++
                 levelDisplay.innerHTML = "Level - " + level
@@ -195,6 +211,7 @@ function spawnEnemy() {
 }
 
 function spawnBullet() {
+    shootSound.play();
     bulletLeft = spaceshipLeft + spaceshipSize;
     bulletTop = spaceshipTop + spaceshipSize / 2 - bulletHeight / 2;
     bullets.push(new DrawBullet(bulletLeft, bulletTop, bulletWidth, bulletHeight, bulletSpeed))
@@ -295,6 +312,7 @@ function enemyBulletCollision() {
     enemies.forEach((enemy, i) => {
         bullets.forEach((bullet, j) => {
             if (enemy.x - bullet.x < bulletWidth && bullet.y - enemy.y < enemySize && bullet.y - enemy.y > 0) {
+                enemyDieSound.play();
                 setTimeout(() => {
                     kills++
                     count += 100
@@ -310,6 +328,7 @@ function enemyBulletCollision() {
 function enemyPlayerCollision() {
     enemies.forEach((enemy, index) => {
         if (Math.abs(enemy.x - spaceshipLeft) < spaceshipSize && Math.abs(spaceshipTop - enemy.y) < enemySize) {
+            gameOverSound.play();
             gameOver();
             saveScore();
             cancelAnimationFrame(requestID);
@@ -352,12 +371,14 @@ pause.addEventListener('click', () => {
     if (pause.innerHTML == "Pause") {
         pause.innerHTML = "Play"
         cancelAnimationFrame(requestID);
+        backgroundSound.pause();
         popupText.innerHTML = `The game is being paused! <br> To continue, press Play button`;
         popup.classList.remove('hide');
         canvas.classList.add('disabled');
     } else if (pause.innerHTML == "Play") {
         pause.innerHTML = "Pause"
         requestID = requestAnimationFrame(animate);
+        backgroundSound.play();
         popup.classList.add('hide');
         canvas.classList.remove('disabled');
     } else if (pause.innerHTML == "New Game") {
@@ -367,6 +388,7 @@ pause.addEventListener('click', () => {
 
 //game over
 function gameOver() {
+    backgroundSound.pause();
     pause.innerHTML = "New Game";
     input.disabled = false;
     popupText.innerHTML = `Hey ${nameDisplay}! <br> The games over! <br> Your Score: ${score}`;
@@ -375,6 +397,8 @@ function gameOver() {
 }
 
 function newGameFunc() {
+    backgroundSound.currentTime = 0;
+    backgroundSound.play();
     popup.classList.add('hide');
     canvas.classList.remove('disabled');
     nameDisplay = input.value;
@@ -416,3 +440,34 @@ function newGameFunc() {
     animate();
     spawnEnemy();
 }
+
+// sounds event listener
+unmute.addEventListener('click', () => {
+    mute.classList.remove("hide");
+    unmute.classList.add("hide");
+    shootSound.muted = true;
+    levelUpSound.muted = true;
+    enemyDieSound.muted = true;
+    gameOverSound.muted = true;
+    clickSound.muted = true;
+})
+mute.addEventListener('click', () => {
+    mute.classList.add("hide");
+    unmute.classList.remove("hide");
+    shootSound.muted = false;
+    levelUpSound.muted = false;
+    enemyDieSound.muted = false;
+    gameOverSound.muted = false;
+    clickSound.muted = false;
+    clickSound.play();
+})
+musicOff.addEventListener('click', () => {
+    musicOn.classList.remove("hide");
+    musicOff.classList.add("hide");
+    backgroundSound.muted = false;
+})
+musicOn.addEventListener('click', () => {
+    musicOn.classList.add("hide");
+    musicOff.classList.remove("hide");
+    backgroundSound.muted = true;
+})

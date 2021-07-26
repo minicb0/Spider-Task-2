@@ -140,6 +140,27 @@ body {
     justify-content: center;
 }
 
+#settingsDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+
+#settingsDiv div {
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+#musicOnImg, #muteImg, #musicOffImg, #unmuteImg {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
 #highscoreDiv {
     display: flex;
     justify-content: center;
