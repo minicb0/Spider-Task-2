@@ -18,6 +18,12 @@ var highScore = document.getElementById('highScore');
 var highName = document.getElementById('highName');
 var popup = document.getElementById("popup");
 var popupText = document.getElementById('popupText');
+var settingsImg = document.getElementById('settingsImg');
+
+// modal
+var modal = document.getElementById("modal");
+var infoImg = document.getElementById("infoImg");
+var close = document.getElementById("close");
 
 // audio switch on/off variables
 var mute = document.getElementById('muteImg')
@@ -88,6 +94,7 @@ var movingUp = false;
 var movingDown = false;
 var movingLeft = false;
 var movingRight = false;
+var gameOn = false;
 popupText.innerHTML = `Click New Game Button to start the game!`;
 canvas.classList.add('disabled');
 
@@ -109,6 +116,27 @@ addEventListener('resize', () => {
     canvas.width = innerWidth / 1.1;
     canvas.height = 450;
 });
+
+// event listeners
+settingsImg.addEventListener('click', () => {
+    document.getElementById('bottom-container').classList.toggle('hide');
+})
+
+// modal
+infoImg.addEventListener('click', () => {
+    if (gameOn == true) {
+        pause.innerHTML = "Play"
+        cancelAnimationFrame(requestID);
+        backgroundSound.pause();
+        popupText.innerHTML = `The game is being paused! <br> To continue, press Play button`;
+        popup.classList.remove('hide');
+        canvas.classList.add('disabled');
+    }
+    modal.style.display = "block";
+})
+close.addEventListener('click', () => {
+    modal.style.display = "none";
+})
 
 // utility function
 function getRandomNumber(min, max) {
@@ -573,6 +601,7 @@ pause.addEventListener('click', () => {
 
 //game over
 function gameOver() {
+    gameOn = false;
     backgroundSound.pause();
     levelCanvas.classList.add('hide')
     pause.innerHTML = "New Game";
@@ -640,6 +669,7 @@ function newGameFunc() {
     clearTimeout(timeoutID2)
     clearTimeout(timeoutID3)
 
+    gameOn = true;
     movingUp = false;
     movingDown = false;
     movingLeft = false;
