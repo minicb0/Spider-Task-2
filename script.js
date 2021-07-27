@@ -61,6 +61,7 @@ var totalEnemies = 0;
 var enemyMatrix = 1;
 var bullets = []
 var enemies = []
+var particles = []
 
 var nameDisplay;
 var requestID;
@@ -139,6 +140,34 @@ class DrawEnemy {
     }
 }
 
+class Particle {
+    constructor(x, y, radius, speedX, speedY, particleAlpha) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.speedX = speedX
+        this.speedY = speedY
+        this.particleAlpha = particleAlpha
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = `rgba(223, 225, 247, ${this.particleAlpha})`
+        ctx.fill();
+        ctx.closePath();
+    }
+    update() {
+        this.draw();
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.particleAlpha -= 0.01
+        if (this.particleAlpha < 0) {
+            this.particleAlpha = 0
+        }
+        this.color = `rgba(223, 225, 247, ${this.particleAlpha})`
+    }
+}
+
 // functions
 function update() {
     //updating other functions
@@ -166,6 +195,15 @@ function update() {
         }
     })
 
+    particles.forEach((particle, index) => {
+        particle.update();
+
+        // removing the particles once they fade out
+        if (particle.particleAlpha == 0) {
+            particles.splice(index, 1);
+        }
+    })
+
     // scoring
     count++;
     score = Math.floor(count / 20)
@@ -187,7 +225,7 @@ function spawnEnemy() {
                     var strength = Math.floor(getRandomNumber(1, 6))
                 }
 
-                    enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength))
+                enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength))
             }
         }
         totalEnemies++
@@ -325,6 +363,12 @@ function enemyBulletCollision() {
                 enemyDieSound.play();
                 setTimeout(() => {
                     if (enemy.strength == 1) {
+                        // burst effect
+                        for (let i = 0; i < 15; i++) {
+                            particleAlpha = 1
+                            particles.push(new Particle(bullet.x + bulletWidth, bullet.y + bulletHeight / 2, 3, Math.random() - 0.5, Math.random() - 0.5, particleAlpha))
+                        }
+
                         kills++
                         count += 100
                         killDisplay.innerHTML = "Kills - " + kills
