@@ -121,13 +121,16 @@ class DrawBullet {
 }
 
 class DrawEnemy {
-    constructor(x, y, size, speed) {
+    constructor(x, y, size, speed, strength) {
         this.x = x
         this.y = y
         this.size = size
         this.speed = speed
+        this.strength = strength
     }
     draw() {
+        var alienImg = new Image(this.size, this.size)
+        alienImg.src = `./assets/images/aliens/alien${this.strength}.png`
         ctx.drawImage(alienImg, this.x, this.y, this.size, this.size);
     }
     update() {
@@ -177,7 +180,14 @@ function spawnEnemy() {
         fireTop = enemyTop;
         for (let row = 0; row < enemyMatrix; row++) {
             for (let column = 0; column < enemyMatrix; column++) {
-                enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed))
+                // different strengths of aliens
+                if (level > 0 && level < 5) {
+                    var strength = Math.floor(getRandomNumber(1, level + 2))
+                } else if (level >= 5) {
+                    var strength = Math.floor(getRandomNumber(1, 6))
+                }
+
+                    enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength))
             }
         }
         totalEnemies++
@@ -292,7 +302,7 @@ document.addEventListener('keyup', (event) => {
 
     movingPlayer();
 });
-0
+
 function movingPlayer() {
     if (movingUp == true) { // up
         spaceshipTop -= spaceshipSpeed
@@ -314,11 +324,16 @@ function enemyBulletCollision() {
             if (enemy.x - bullet.x < bulletWidth && bullet.y - enemy.y < enemySize && bullet.y - enemy.y > 0) {
                 enemyDieSound.play();
                 setTimeout(() => {
-                    kills++
-                    count += 100
-                    killDisplay.innerHTML = "Kills - " + kills
-                    enemies.splice(i, 1)
-                    bullets.splice(j, 1)
+                    if (enemy.strength == 1) {
+                        kills++
+                        count += 100
+                        killDisplay.innerHTML = "Kills - " + kills
+                        enemies.splice(i, 1)
+                        bullets.splice(j, 1)
+                    } else if (enemy.strength > 1) {
+                        enemy.strength -= 1
+                        bullets.splice(j, 1)
+                    }
                 }, 0)
             }
         })
