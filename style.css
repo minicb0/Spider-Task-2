@@ -57,6 +57,12 @@ body {
     align-items: center;
 }
 
+#pauseDiv div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #settingsImg, #infoImg {
     transition: transform .7s ease-in-out;
     width: 50px;
@@ -263,7 +269,7 @@ table tr:first-child td:last-child {
     display: block;
 }
 
-#leftModal div {
+#leftModal div, #rightModal div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -304,4 +310,92 @@ table tr:first-child td:last-child {
     transform: rotate(45deg);
     color: rgb(180, 179, 179);
     cursor: pointer;
+}
+
+/* media queries */
+@media (max-width: 1300px) {
+    #modalContent {
+        display: block;
+    }
+    #modalContent table {
+        margin: 20px;
+        max-width: 725px;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        font-size: 15px;
+    }
+    table td {
+        font-size: 15px;
+    }
+    #nameDiv input {
+        font-size: 17px;
+        height: 20px;
+        width: 150px;
+    }
+    #pause, #newGame {
+        font-size: 15px;
+    }
+    #settingsImg, #infoImg {
+        width: 40px;
+        height: 40px;
+    }
+    #coinImg {
+        width: 17px;
+        height: 17px;
+    }
+}
+
+@media (max-width: 475px) {
+    body {
+        font-size: 14px;
+    }
+    table td {
+        font-size: 14px;
+    }
+    #nameDiv input {
+        font-size: 15px;
+        height: 18px;
+        width: 150px;
+    }
+    #pause, #newGame {
+        font-size: 14px;
+    }
+    #settingsImg, #infoImg {
+        width: 30px;
+        height: 30px;
+    }
+    #coinImg {
+        width: 17px;
+        height: 17px;
+    }
+}
+
+@media (max-width: 435px) {
+    #scoresDiv {
+        display: block;
+    }
+    #pauseDiv {
+        display: block;
+    }
+    #nameDiv {
+        display: block;
+    }
+}
+
+@media (max-width: 385px) {
+    #settingsDiv {
+        display: block;
+    }
+}
+
+@media (max-width: 325px) {
+    #nameLabelDiv {
+        display: block;
+    }
+    #nameLabelDiv label {
+        display: block;
+    }
 }
