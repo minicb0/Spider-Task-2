@@ -7,6 +7,7 @@ canvas.height = 450;
 var spaceshipImg = document.getElementById("spaceshipImg");
 var alienImg = document.getElementById('alienImg');
 var scoreDisplay = document.getElementById('score');
+var coinsDisplay = document.getElementById('coins');
 var killDisplay = document.getElementById('kill');
 var levelDisplay = document.getElementById('level');
 var levelCanvas = document.getElementById('levelCanvas');
@@ -30,6 +31,8 @@ var enemyDieSound = new Audio('./assets/audio/enemyDie.mp3');
 var levelUpSound = new Audio('./assets/audio/levelUp.mp3');
 var gameOverSound = new Audio('./assets/audio/gameOver.mp3');
 var clickSound = new Audio('./assets/audio/click.mp3');
+var coinSound = new Audio('./assets/audio/coin.mp3');
+var diamondSound = new Audio('./assets/audio/diamond.wav');
 var backgroundSound = new Audio('./assets/audio/background.mp3');
 backgroundSound.loop = true;
 
@@ -38,6 +41,7 @@ var spaceshipSize = 75;
 var enemySize = 50;
 var bulletWidth = 15;
 var bulletHeight = 5;
+var powerupSize = 30;
 
 // default positions
 var spaceshipLeft = 0;
@@ -51,21 +55,33 @@ var bulletTop;
 var spaceshipSpeed = 25;
 var enemySpeed = 1;
 var bulletSpeed = 5;
+var powerupSpeed = 3;
 
 // initial scores
 var count = 0;
 var score = 0;
+var coins = 0;
 var kills = 0;
 var level = 1;
 var totalEnemies = 0;
 var enemyMatrix = 1;
 var bullets = []
 var enemies = []
+var powerups = []
 var particles = []
 
 var nameDisplay;
 var requestID;
 var enemyDistance = 70;
+var gunStrength = 1;
+var powerupsIDs = ['coin', 'coin', 'coin', 'fire', 'diamond'] // probablity of spawning coins is more than diamond/fire
+
+// intervals and timeouts
+var timeoutID1
+var timeoutID2
+var timeoutID3
+var intervalID1
+var intervalID2
 
 // initial conditions
 var movingUp = false;
@@ -140,6 +156,25 @@ class DrawEnemy {
     }
 }
 
+class DrawPowerup {
+    constructor(x, y, size, speed, id) {
+        this.x = x
+        this.y = y
+        this.size = size
+        this.speed = speed
+        this.id = id
+    }
+    draw() {
+        var powerupImg = new Image(this.size, this.size)
+        powerupImg.src = `./assets/images/powerups/${this.id}.png`
+        ctx.drawImage(powerupImg, this.x, this.y, this.size, this.size);
+    }
+    update() {
+        this.draw();
+        this.x -= this.speed;
+    }
+}
+
 class Particle {
     constructor(x, y, radius, speedX, speedY, particleAlpha) {
         this.x = x
@@ -173,6 +208,7 @@ function update() {
     //updating other functions
     enemyPlayerCollision();
     enemyBulletCollision();
+    powerupPlayerCollision();
 
     // spaceship - drawing player
     ctx.drawImage(spaceshipImg, spaceshipLeft, spaceshipTop, spaceshipSize, spaceshipSize);
@@ -195,6 +231,15 @@ function update() {
         }
     })
 
+    powerups.forEach((powerup, index) => {
+        powerup.update();
+
+        // removing the powerups once they go out of the canvas area
+        if (powerup.x < - powerupSize) {
+            powerups.splice(index, 1);
+        }
+    })
+
     particles.forEach((particle, index) => {
         particle.update();
 
@@ -210,28 +255,31 @@ function update() {
     scoreDisplay.innerHTML = "Score - " + score
 }
 
-function spawnEnemy() {
-    var k = setInterval(() => {
-        enemyLeft = canvas.width + 1;
-        enemyTop = getRandomNumber(0, canvas.height - enemyDistance * enemyMatrix);
-        fireLeft = enemyLeft;
-        fireTop = enemyTop;
-        for (let row = 0; row < enemyMatrix; row++) {
-            for (let column = 0; column < enemyMatrix; column++) {
-                // different strengths of aliens
-                if (level > 0 && level < 5) {
-                    var strength = Math.floor(getRandomNumber(1, level + 2))
-                } else if (level >= 5) {
-                    var strength = Math.floor(getRandomNumber(1, 6))
-                }
-
-                enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength))
+function enemyFunc() {
+    console.log("hello")
+    enemyLeft = canvas.width + 1;
+    enemyTop = getRandomNumber(0, canvas.height - enemyDistance * enemyMatrix);
+    for (let row = 0; row < enemyMatrix; row++) {
+        for (let column = 0; column < enemyMatrix; column++) {
+            // different strengths of aliens
+            if (level > 0 && level < 5) {
+                var strength = Math.floor(getRandomNumber(1, level + 2))
+            } else if (level >= 5) {
+                var strength = Math.floor(getRandomNumber(1, 6))
             }
+
+            enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength))
         }
-        totalEnemies++
-    }, 1000 + 1000 * level)
-    setInterval(() => {
+    }
+    totalEnemies++
+}
+
+function spawnEnemy() {
+    intervalID1 = setInterval(enemyFunc, 1000 + 1000 * level)
+
+    intervalID2 = setInterval(() => {
         if (totalEnemies > 3) {
+            clearInterval(intervalID1)
             if (enemies.length == 0) {
                 levelUpSound.play();
                 count += 200
@@ -240,8 +288,22 @@ function spawnEnemy() {
                 levelCanvas.innerHTML = "Level - " + level
                 levelCanvas.classList.remove("hide")
                 totalEnemies = 0;
-                spawnEnemy();
-                setTimeout(() => {
+                intervalID1 = setInterval(enemyFunc, 1000 + 1000 * level)
+
+                // gun strength higher at higher levels
+                if (level == 4 || level == 5 || level == 6) {
+                    if (gunStrength == 1) {
+                        gunStrength = 2
+                        spaceshipSize = 85
+                    }
+                } else if (level > 6) {
+                    if (gunStrength == 2) {
+                        gunStrength = 3
+                        spaceshipSize = 95
+                    }
+                }
+
+                timeoutID1 = setTimeout(() => {
                     levelCanvas.classList.add("hide")
                     enemyMatrix++
                     if (level == 4) {
@@ -253,7 +315,6 @@ function spawnEnemy() {
                     }
                 }, 1000 * level)
             }
-            clearTimeout(k)
         }
     }, 10)
 }
@@ -262,7 +323,34 @@ function spawnBullet() {
     shootSound.play();
     bulletLeft = spaceshipLeft + spaceshipSize;
     bulletTop = spaceshipTop + spaceshipSize / 2 - bulletHeight / 2;
-    bullets.push(new DrawBullet(bulletLeft, bulletTop, bulletWidth, bulletHeight, bulletSpeed))
+    if (gunStrength == 1) {
+        bullets.push(new DrawBullet(bulletLeft, bulletTop, bulletWidth, bulletHeight, bulletSpeed))
+    } else if (gunStrength == 2) {
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop - 15, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop + 15, bulletWidth, bulletHeight, bulletSpeed))
+    } else if (gunStrength == 3) {
+        bullets.push(new DrawBullet(bulletLeft, bulletTop, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop - 15, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop + 15, bulletWidth, bulletHeight, bulletSpeed))
+    } else if (gunStrength == 4) {
+        bullets.push(new DrawBullet(bulletLeft - 10, bulletTop - 25, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 10, bulletTop + 25, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop - 15, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop + 15, bulletWidth, bulletHeight, bulletSpeed))
+    } else if (gunStrength == 5) {
+        bullets.push(new DrawBullet(bulletLeft, bulletTop, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 10, bulletTop - 25, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 10, bulletTop + 25, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop - 15, bulletWidth, bulletHeight, bulletSpeed))
+        bullets.push(new DrawBullet(bulletLeft - 5, bulletTop + 15, bulletWidth, bulletHeight, bulletSpeed))
+    }
+}
+
+function spawnPowerups(enemyLeft, enemyTop) {
+    var powerupLeft = enemyLeft - powerupSize;
+    var powerupTop = enemyTop;
+    var id = powerupsIDs[Math.floor(Math.random() * powerupsIDs.length)];
+    powerups.push(new DrawPowerup(powerupLeft, powerupTop, powerupSize, powerupSpeed, id))
 }
 
 document.addEventListener('keyup', (event) => { // space
@@ -361,7 +449,7 @@ function enemyBulletCollision() {
         bullets.forEach((bullet, j) => {
             if (enemy.x - bullet.x < bulletWidth && bullet.y - enemy.y < enemySize && bullet.y - enemy.y > 0) {
                 enemyDieSound.play();
-                setTimeout(() => {
+                timeoutID2 = setTimeout(() => {
                     if (enemy.strength == 1) {
                         // burst effect
                         for (let i = 0; i < 15; i++) {
@@ -369,6 +457,12 @@ function enemyBulletCollision() {
                             particles.push(new Particle(bullet.x + bulletWidth, bullet.y + bulletHeight / 2, 3, Math.random() - 0.5, Math.random() - 0.5, particleAlpha))
                         }
 
+                        // spawning powerups - randomly
+                        if (Math.random() < 0.4) {
+                            spawnPowerups(enemy.x, enemy.y)
+                        }
+
+                        // incleasing kills
                         kills++
                         count += 100
                         killDisplay.innerHTML = "Kills - " + kills
@@ -391,6 +485,38 @@ function enemyPlayerCollision() {
             gameOver();
             saveScore();
             cancelAnimationFrame(requestID);
+        }
+    })
+}
+
+function powerupPlayerCollision() {
+    powerups.forEach((powerup, index) => {
+        if (Math.abs(powerup.x - spaceshipLeft) < spaceshipSize && Math.abs(spaceshipTop - powerup.y) < powerupSize) {
+            if (powerup.id == 'coin') {
+                coins++;
+                coinsDisplay.innerHTML = coins;
+                count += 100
+                coinSound.play();
+                powerups.splice(index, 1)
+            } else if (powerup.id == 'diamond') {
+                if (gunStrength < 5) {
+                    gunStrength += 1
+                    spaceshipSize += 10
+                    diamondSound.play();
+                    powerups.splice(index, 1)
+                    timeoutID3 = setTimeout(() => {
+                        gunStrength -= 1
+                        spaceshipSize -= 10
+                    }, 10000 + 1000 * level)
+                } else if (gunStrength > 4) {
+                    return;
+                }
+            } else if (powerup.id == 'fire') {
+                gameOverSound.play();
+                gameOver();
+                saveScore();
+                cancelAnimationFrame(requestID);
+            }
         }
     })
 }
@@ -448,16 +574,24 @@ pause.addEventListener('click', () => {
 //game over
 function gameOver() {
     backgroundSound.pause();
+    levelCanvas.classList.add('hide')
     pause.innerHTML = "New Game";
     input.disabled = false;
     popupText.innerHTML = `Hey ${nameDisplay}! <br> The games over! <br> Your Score: ${score}`;
     popup.classList.remove('hide');
     canvas.classList.add('disabled');
+    // clearing intervals and timeouts
+    clearInterval(intervalID1)
+    clearInterval(intervalID2)
+    clearTimeout(timeoutID1)
+    clearTimeout(timeoutID2)
+    clearTimeout(timeoutID3)
 }
 
 function newGameFunc() {
     backgroundSound.currentTime = 0;
     backgroundSound.play();
+    levelCanvas.classList.add('hide')
     popup.classList.add('hide');
     canvas.classList.remove('disabled');
     nameDisplay = input.value;
@@ -469,6 +603,7 @@ function newGameFunc() {
     enemySize = 50;
     bulletWidth = 15;
     bulletHeight = 5;
+    powerupSize = 30;
 
     spaceshipLeft = 0;
     spaceshipTop = canvas.height / 2 - spaceshipSize / 2;
@@ -476,12 +611,15 @@ function newGameFunc() {
     spaceshipSpeed = 25;
     enemySpeed = 1;
     bulletSpeed = 5;
+    powerupSpeed = 3;
 
     count = 0;
     score = 0;
+    coins = 0;
     kills = 0;
     level = 1;
     scoreDisplay.innerHTML = "Score - " + score;
+    coinsDisplay.innerHTML = coins;
     killDisplay.innerHTML = "Kills - " + kills;
     levelDisplay.innerHTML = "Level - " + level;
 
@@ -489,7 +627,18 @@ function newGameFunc() {
     enemyMatrix = 1;
     bullets = []
     enemies = []
+    particles = []
+    powerups = []
     enemyDistance = 70;
+    gunStrength = 1;
+    powerupsIDs = ['coin', 'coin', 'coin', 'fire', 'diamond']
+
+    // clearing intervals and timeouts
+    clearInterval(intervalID1)
+    clearInterval(intervalID2)
+    clearTimeout(timeoutID1)
+    clearTimeout(timeoutID2)
+    clearTimeout(timeoutID3)
 
     movingUp = false;
     movingDown = false;
@@ -509,6 +658,8 @@ unmute.addEventListener('click', () => {
     enemyDieSound.muted = true;
     gameOverSound.muted = true;
     clickSound.muted = true;
+    coinSound.muted = true;
+    diamondSound.muted = true;
 })
 mute.addEventListener('click', () => {
     mute.classList.add("hide");
@@ -518,6 +669,8 @@ mute.addEventListener('click', () => {
     enemyDieSound.muted = false;
     gameOverSound.muted = false;
     clickSound.muted = false;
+    coinSound.muted = false;
+    diamondSound.muted = false;
     clickSound.play();
 })
 musicOff.addEventListener('click', () => {
