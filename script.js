@@ -284,7 +284,6 @@ function update() {
 }
 
 function enemyFunc() {
-    console.log("hello")
     enemyLeft = canvas.width + 1;
     enemyTop = getRandomNumber(0, canvas.height - enemyDistance * enemyMatrix);
     for (let row = 0; row < enemyMatrix; row++) {
@@ -475,7 +474,7 @@ function movingPlayer() {
 function enemyBulletCollision() {
     enemies.forEach((enemy, i) => {
         bullets.forEach((bullet, j) => {
-            if (enemy.x - bullet.x < bulletWidth && bullet.y - enemy.y < enemySize && bullet.y - enemy.y > 0) {
+            if (((bullet.x > enemy.x && Math.abs(bullet.x - enemy.x) < enemySize) || (bullet.x < enemy.x && Math.abs(enemy.x - bullet.x) < bulletWidth)) && ((enemy.y > bullet.y && Math.abs(enemy.y - bullet.y) < bulletHeight) || (enemy.y < bullet.y && Math.abs(bullet.y - enemy.y) < enemySize))) {
                 enemyDieSound.play();
                 timeoutID2 = setTimeout(() => {
                     if (enemy.strength == 1) {
@@ -508,7 +507,7 @@ function enemyBulletCollision() {
 
 function enemyPlayerCollision() {
     enemies.forEach((enemy, index) => {
-        if (Math.abs(enemy.x - spaceshipLeft) < spaceshipSize && Math.abs(spaceshipTop - enemy.y) < enemySize) {
+        if (((enemy.x > spaceshipLeft && Math.abs(enemy.x - spaceshipLeft) < spaceshipSize) || (enemy.x < spaceshipLeft && Math.abs(spaceshipLeft - enemy.x) < enemySize)) && ((enemy.y > spaceshipTop && Math.abs(enemy.y - spaceshipTop) < spaceshipSize) || (enemy.y < spaceshipTop && Math.abs(spaceshipTop - enemy.y) < enemySize))) {
             gameOverSound.play();
             gameOver();
             saveScore();
@@ -519,7 +518,7 @@ function enemyPlayerCollision() {
 
 function powerupPlayerCollision() {
     powerups.forEach((powerup, index) => {
-        if (Math.abs(powerup.x - spaceshipLeft) < spaceshipSize && Math.abs(spaceshipTop - powerup.y) < powerupSize) {
+        if (((powerup.x > spaceshipLeft && Math.abs(powerup.x - spaceshipLeft) < spaceshipSize) || (powerup.x < spaceshipLeft && Math.abs(spaceshipLeft - powerup.x) < powerupSize)) && ((powerup.y > spaceshipTop && Math.abs(powerup.y - spaceshipTop) < spaceshipSize) || (powerup.y < spaceshipTop && Math.abs(spaceshipTop - powerup.y) < powerupSize))) {
             if (powerup.id == 'coin') {
                 coins++;
                 coinsDisplay.innerHTML = coins;
