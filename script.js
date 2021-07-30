@@ -173,17 +173,25 @@ class DrawBullet {
 }
 
 class DrawEnemy {
-    constructor(x, y, size, speed, strength) {
+    constructor(x, y, size, speed, strength, id) {
         this.x = x
         this.y = y
         this.size = size
         this.speed = speed
         this.strength = strength
+        this.id = id
     }
     draw() {
         var alienImg = new Image(this.size, this.size)
-        alienImg.src = `./assets/images/aliens/alien${this.strength}.png`
-        ctx.drawImage(alienImg, this.x, this.y, this.size, this.size);
+        if (this.id == "special") {
+            ctx.fillStyle = "green"
+            ctx.fillRect(this.x, this.y - 10, this.strength, 5)
+            alienImg.src = `./assets/images/aliens/alien6.png`
+            ctx.drawImage(alienImg, this.x, this.y, this.size, this.size);
+        } else {
+            alienImg.src = `./assets/images/aliens/alien${this.strength}.png`
+            ctx.drawImage(alienImg, this.x, this.y, this.size, this.size);
+        }
     }
     update() {
         this.draw();
@@ -328,7 +336,7 @@ function update() {
 
 function enemyFunc() {
     enemyLeft = canvas.width + 1;
-    enemyTop = getRandomNumber(0, canvas.height - enemyDistance * enemyMatrix);
+    enemyTop = getRandomNumber(20, canvas.height - enemyDistance * enemyMatrix);
     for (let row = 0; row < enemyMatrix; row++) {
         for (let column = 0; column < enemyMatrix; column++) {
             // different strengths of aliens
@@ -338,7 +346,12 @@ function enemyFunc() {
                 var strength = Math.floor(getRandomNumber(1, 6))
             }
 
-            enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength))
+            // special levels
+            if (level == 3 || level == 5 || level == 7 || level == 9 || level == 11) {
+                enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, enemySize, 'special'))
+            } else {
+                enemies.push(new DrawEnemy(enemyLeft + row * enemyDistance, enemyTop + column * enemyDistance, enemySize, enemySpeed, strength, 'notSpecial'))
+            }
         }
     }
     totalEnemies++
@@ -355,12 +368,16 @@ function spawnEnemy() {
                 count += 200
                 level++
                 bonusPoints.push(new DrawBonus(canvas.width / 2, canvas.height / 2, 1, 1, '+10 - Level Advanced'))
+                if (level == 3 || level == 5 || level == 7 || level == 9 || level == 11) {
+                    levelCanvas.innerHTML = "Level - " + level + ": Special Level"
+                } else {
+                    levelCanvas.innerHTML = "Level - " + level
+                }
                 levelDisplay.innerHTML = "Level - " + level
-                levelCanvas.innerHTML = "Level - " + level
                 levelCanvas.classList.remove("hide")
                 totalEnemies = 0;
                 intervalID1 = setInterval(enemyFunc, 1000 + 1000 * level)
-
+                
                 timeoutID1 = setTimeout(() => {
                     levelCanvas.classList.add("hide")
                     enemyMatrix++
@@ -545,7 +562,14 @@ function enemyBulletCollision() {
                         enemies.splice(i, 1)
                         bullets.splice(j, 1)
                     } else if (enemy.strength > 1) {
-                        enemy.strength -= 1
+                        if (enemy.id == 'special') {
+                            enemy.strength -= enemy.size / getRandomNumber(4, 9)
+                            if (enemy.strength < 1) {
+                                enemy.strength = 1
+                            }
+                        } else {
+                            enemy.strength -= 1
+                        }
                         count += 20
                         bonusPoints.push(new DrawBonus(enemy.x + enemySize / 2, enemy.y, 1, 1, '+1'))
                         bullets.splice(j, 1)
@@ -594,9 +618,9 @@ function powerupPlayerCollision() {
                     healthSound.play();
                     powerups.splice(index, 1)
                     if (level > 5) {
-                        spaceshipHealth += canvas.width/10
+                        spaceshipHealth += canvas.width / 10
                     } else {
-                        spaceshipHealth += canvas.width/20
+                        spaceshipHealth += canvas.width / 20
                     }
                 }
             } else if (powerup.id == 'diamond') {
