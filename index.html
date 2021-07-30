@@ -10,8 +10,8 @@
 </head>
 
 <body>
-     <!-- modal -->
-     <div id="modal" class="">
+    <!-- modal -->
+    <div id="modal" class="">
         <div id="close">&times;</div>
         <div id="modalContent">
             <div id="leftModal">
@@ -21,15 +21,38 @@
                             <td>About Game</td>
                         </tr>
                         <tr>
-                            <td style="text-align: left;"><span style="color: rgb(255, 62, 62);">To Move the Spaceship: </span>ASDW / Arrow Keys <br> <span style="color: rgb(255, 62, 62);">To Shoot: </span>Space / Left-Mouse-Click <br>Collect Coins and kill aliens to increase your Score. Some aliens release powerups when they die, collect them to get bonus points. Collect Diamonds to increase your gun strength to kill the aliens rapidly. The number of bullets released from the gun at a time is decided by your gun strength. As the level increses, you'll bydefault get higher gun strength. <br> <span style="color: rgb(255, 62, 62);">At Level 4: </span>Gun Strength - 2 <br> <span style="color: rgb(255, 62, 62);">At Level > 6:</span> Gun Strength - 3<br> P.S. Maximum Gun Strength: 5 </td>
+                            <td style="text-align: left;"><span class="highlightRed">To Move the Spaceship:
+                                </span>ASDW / Arrow Keys <br> <span class="highlightRed">To Shoot:
+                                </span>Space / Left-Mouse-Click <br>
+                                <ul>
+                                    <li>
+                                        <span class="highlightGreen">To Increase the Score:</span> Collecting Coins gives you +5 Score. Killing aliens gives you +5 Score. Killing aliens of higher strength gives you the score accordingly.
+                                    </li>
+                                    <li>
+                                        <span class="highlightGreen">When Aliens Die: </span>Some Aliens release Powerups when they die, collect them to get bonus points. Some Aliens releases Fire when they die, escape from it.
+                                    </li>
+                                    <li>
+                                        <span class="highlightGreen">Gun Strength: </span>The number of bullets released from the gun at a time is decided by your gun strength. As the level increses, you'll bydefault get higher gun strength. <br>
+                                        <span class="highlightGreen">Level 4 or higher: </span>Gun Strength - 2 <br>
+                                        <span class="highlightGreen">Level 7 or higher: </span>Gun Strength - 3<br> 
+                                        P.S. Maximum Gun Strength - 5
+                                    </li>
+                                    <li>
+                                        <span class="highlightGreen">Player Health: </span>At the top of game, a green-coloured bar is shown which represents spaceship health. Colliding with Enemies reduces your health. Collect Health Portions to increase your health.<br>
+                                    </li>
+                                    <li>
+                                        <span class="highlightGreen">Special Levels: </span>Special levels helps to boost your score. They are red-coloured aliens which are much stronger than the usuals so they come with thier health bar.<br>
+                                    </li>
+                                </ul>
+                            </td>
                         </tr>
                     </table>
                 </div>
                 <div>
                     <table>
                         <tr>
-                            <td></td>
                             <td>Powerups</td>
+                            <td>Powers</td>
                         </tr>
                         <tr>
                             <td>
@@ -45,6 +68,13 @@
                             </td>
                             <td>It increases your Gun Strength for a while to kill the aliens rapidly</td>
                         </tr>
+                        <tr>
+                            <td>
+                                <div>Health Portion</div>
+                                <img src="./assets/images/powerups/health.png" class="powerupsImg">
+                            </td>
+                            <td>It increases your health as shown in the top green-coloured bar of the game.</td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -52,32 +82,44 @@
                 <div>
                     <table>
                         <tr>
-                            <td></td>
                             <td>Enemies</td>
-                        </tr>
-                        <tr>
-                            <td><img src="./assets/images/aliens/alien1.png" class="alienImg"></td>
-                            <td>Takes 1 bullet to kill, Strength: 1</td>
-                        </tr>
-                        <tr>
-                            <td><img src="./assets/images/aliens/alien2.png" class="alienImg"></td>
-                            <td>Takes 2 bullet to kill, Strength: 2</td>
-                        </tr>
-                        <tr>
-                            <td><img src="./assets/images/aliens/alien3.png" class="alienImg"></td>
-                            <td>Takes 3 bullet to kill, Strength: 3</td>
-                        </tr>
-                        <tr>
-                            <td><img src="./assets/images/aliens/alien4.png" class="alienImg"></td>
-                            <td>Takes 4 bullet to kill, Strength: 4</td>
-                        </tr>
-                        <tr>
-                            <td><img src="./assets/images/aliens/alien5.png" class="alienImg"></td>
-                            <td>Takes 5 bullet to kill, Strength: 5</td>
+                            <td>Strength</td>
+                            <td>Unlocks At</td>
                         </tr>
                         <tr>
                             <td><img src="./assets/images/powerups/fire.png" class="alienImg"></td>
-                            <td>Some Aliens release fire when they die, player has to escape from it</td>
+                            <td>Player has to escape from fires</td>
+                            <td>Level 1</td>
+                        </tr>
+                        <tr>
+                            <td><img src="./assets/images/aliens/alien1.png" class="alienImg"></td>
+                            <td>Takes 1 bullet to kill</td>
+                            <td>Level 1</td>
+                        </tr>
+                        <tr>
+                            <td><img src="./assets/images/aliens/alien2.png" class="alienImg"></td>
+                            <td>Takes 2 bullet to kill</td>
+                            <td>Level 1</td>
+                        </tr>
+                        <tr>
+                            <td><img src="./assets/images/aliens/alien3.png" class="alienImg"></td>
+                            <td>Takes 3 bullet to kill</td>
+                            <td>Level 2</td>
+                        </tr>
+                        <tr>
+                            <td><img src="./assets/images/aliens/alien4.png" class="alienImg"></td>
+                            <td>Takes 4 bullet to kill</td>
+                            <td>Level 3</td>
+                        </tr>
+                        <tr>
+                            <td><img src="./assets/images/aliens/alien5.png" class="alienImg"></td>
+                            <td>Takes 5 bullet to kill</td>
+                            <td>Level 4</td>
+                        </tr>
+                        <tr>
+                            <td><img src="./assets/images/aliens/alien6.png" class="alienImg"></td>
+                            <td>Strongest, Have Highest Strength, Have Health Bar</td>
+                            <td>Special Levels: Level 3, 5, 7, 9, 11</td>
                         </tr>
                     </table>
                 </div>

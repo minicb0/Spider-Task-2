@@ -232,6 +232,14 @@ table tr:first-child td:last-child {
     display: none;
 }
 
+.highlightGreen {
+    color: rgb(77, 241, 77);
+}
+
+.highlightRed {
+    color: rgb(255, 62, 62);
+}
+
 /* modal  */
 #modal {
     display: none;
@@ -247,9 +255,10 @@ table tr:first-child td:last-child {
 
 #modalContent {
     margin: auto;
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; */
+    display: block;
     margin-top: 50px;
     text-align: center;
     color: rgb(209, 208, 208);
@@ -275,12 +284,14 @@ table tr:first-child td:last-child {
     align-items: center;
 }
 
-#leftModal div table {
-    max-width: 700px;
+#leftModal li {
+    margin-left: 20px;
 }
 
 #modalContent table {
-    margin: 30px;
+    /* margin: 30px; */
+    margin: 20px;
+    max-width: 725px;
 }
 
 #modalContent table td {
@@ -292,14 +303,14 @@ table tr:first-child td:last-child {
 }
 
 .alienImg, .powerupsImg {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
 }
 
 #close {
-    position: absolute;
+    position: fixed;
     top: 15px;
-    right: 35px;
+    right: 45px;
     color: #ffffff;
     font-size: 40px;
     font-weight: bold;
@@ -313,15 +324,6 @@ table tr:first-child td:last-child {
 }
 
 /* media queries */
-@media (max-width: 1300px) {
-    #modalContent {
-        display: block;
-    }
-    #modalContent table {
-        margin: 20px;
-        max-width: 725px;
-    }
-}
 
 @media (max-width: 600px) {
     body {
@@ -370,6 +372,10 @@ table tr:first-child td:last-child {
     #coinImg {
         width: 17px;
         height: 17px;
+    }
+    .alienImg, .powerupsImg {
+        width: 45px;
+        height: 45px;
     }
 }
 
