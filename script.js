@@ -39,6 +39,7 @@ var gameOverSound = new Audio('./assets/audio/gameOver.mp3');
 var clickSound = new Audio('./assets/audio/click.mp3');
 var coinSound = new Audio('./assets/audio/coin.mp3');
 var diamondSound = new Audio('./assets/audio/diamond.wav');
+var healthSound = new Audio('./assets/audio/health.wav');
 var backgroundSound = new Audio('./assets/audio/background.mp3');
 backgroundSound.loop = true;
 
@@ -77,11 +78,12 @@ var powerups = []
 var particles = []
 var bonusPoints = []
 
+var spaceshipHealth = canvas.width;
 var nameDisplay;
 var requestID;
 var enemyDistance = 70;
 var gunStrength = 1;
-var powerupsIDs = ['coin', 'coin', 'coin', 'fire', 'diamond'] // probablity of spawning coins is more than diamond/fire
+var powerupsIDs = ['coin', 'coin', 'coin', 'coin', 'fire', 'health', 'fire', 'diamond', 'diamond'] // probablity of spawning coins is more than diamond/fire
 
 // intervals and timeouts
 var timeoutID1
@@ -114,6 +116,10 @@ if (localStorage.getItem("highScore") == null) {
 
 // resize browser
 addEventListener('resize', () => {
+    if (spaceshipHealth == canvas.width) {
+        canvas.width = innerWidth / 1.1;
+        spaceshipHealth = canvas.width;
+    }
     canvas.width = innerWidth / 1.1;
     canvas.height = 450;
 });
@@ -265,6 +271,8 @@ function update() {
     powerupPlayerCollision();
 
     // spaceship - drawing player
+    ctx.fillStyle = "green"
+    ctx.fillRect(0, 0, spaceshipHealth, 10)
     ctx.drawImage(spaceshipImg, spaceshipLeft, spaceshipTop, spaceshipSize, spaceshipSize);
 
     bullets.forEach((bullet, index) => {
@@ -370,22 +378,22 @@ function spawnEnemy() {
 }
 
 function spawnBullet() {
-        // gun strength higher at higher levels
-        if (gunStrength < 1) {
-            gunStrength = 1
-            spaceshipSize = 75
+    // gun strength higher at higher levels
+    if (gunStrength < 1) {
+        gunStrength = 1
+        spaceshipSize = 75
+    }
+    if (level == 4 || level == 5 || level == 6) {
+        if (gunStrength < 2) {
+            gunStrength = 2
+            spaceshipSize = 85
         }
-        if (level == 4 || level == 5 || level == 6) {
-            if (gunStrength < 2) {
-                gunStrength = 2
-                spaceshipSize = 85
-            }
-        } else if (level > 6) {
-            if (gunStrength < 3) {
-                gunStrength = 3
-                spaceshipSize = 95
-            }
+    } else if (level > 6) {
+        if (gunStrength < 3) {
+            gunStrength = 3
+            spaceshipSize = 95
         }
+    }
 
     shootSound.play();
     bulletLeft = spaceshipLeft + spaceshipSize;
@@ -551,10 +559,22 @@ function enemyBulletCollision() {
 function enemyPlayerCollision() {
     enemies.forEach((enemy, index) => {
         if (((enemy.x > spaceshipLeft && Math.abs(enemy.x - spaceshipLeft) < spaceshipSize) || (enemy.x < spaceshipLeft && Math.abs(spaceshipLeft - enemy.x) < enemySize)) && ((enemy.y > spaceshipTop && Math.abs(enemy.y - spaceshipTop) < spaceshipSize) || (enemy.y < spaceshipTop && Math.abs(spaceshipTop - enemy.y) < enemySize))) {
-            gameOverSound.play();
-            gameOver();
-            saveScore();
-            cancelAnimationFrame(requestID);
+            spaceshipHealth -= canvas.width / 5
+
+            if (spaceshipHealth < 0) {
+                gameOverSound.play();
+                gameOver();
+                saveScore();
+                cancelAnimationFrame(requestID);
+            } else {
+                enemies.splice(index, 1)
+                // burst effect
+                for (let i = 0; i < 15; i++) {
+                    particleAlpha = 1
+                    particles.push(new DrawParticle(enemy.x, enemy.y, 3, Math.random() - 0.5, Math.random() - 0.5, particleAlpha))
+                }
+                enemyDieSound.play();
+            }
         }
     })
 }
@@ -569,6 +589,16 @@ function powerupPlayerCollision() {
                 bonusPoints.push(new DrawBonus(powerup.x, powerup.y + powerupSize / 2, 1, 1, '+5'))
                 coinSound.play();
                 powerups.splice(index, 1)
+            } else if (powerup.id == "health") {
+                if (spaceshipHealth < canvas.width) {
+                    healthSound.play();
+                    powerups.splice(index, 1)
+                    if (level > 5) {
+                        spaceshipHealth += canvas.width/10
+                    } else {
+                        spaceshipHealth += canvas.width/20
+                    }
+                }
             } else if (powerup.id == 'diamond') {
                 if (gunStrength < 5) {
                     gunStrength += 1
@@ -583,10 +613,17 @@ function powerupPlayerCollision() {
                     return;
                 }
             } else if (powerup.id == 'fire') {
-                gameOverSound.play();
-                gameOver();
-                saveScore();
-                cancelAnimationFrame(requestID);
+                spaceshipHealth -= canvas.width / 5
+
+                if (spaceshipHealth < 0) {
+                    gameOverSound.play();
+                    gameOver();
+                    saveScore();
+                    cancelAnimationFrame(requestID);
+                } else {
+                    powerups.splice(index, 1)
+                    enemyDieSound.play();
+                }
             }
         }
     })
@@ -701,9 +738,11 @@ function newGameFunc() {
     enemies = []
     particles = []
     powerups = []
+    bonusPoints = []
+    spaceshipHealth = canvas.width;
     enemyDistance = 70;
     gunStrength = 1;
-    powerupsIDs = ['coin', 'coin', 'coin', 'fire', 'diamond']
+    powerupsIDs = ['coin', 'coin', 'coin', 'coin', 'fire', 'health', 'fire', 'diamond', 'diamond'];
 
     // clearing intervals and timeouts
     clearInterval(intervalID1)
@@ -733,6 +772,7 @@ unmute.addEventListener('click', () => {
     clickSound.muted = true;
     coinSound.muted = true;
     diamondSound.muted = true;
+    healthSound.muted = true;
 })
 mute.addEventListener('click', () => {
     mute.classList.add("hide");
@@ -744,6 +784,7 @@ mute.addEventListener('click', () => {
     clickSound.muted = false;
     coinSound.muted = false;
     diamondSound.muted = false;
+    healthSound.muted = false;
     clickSound.play();
 })
 musicOff.addEventListener('click', () => {
