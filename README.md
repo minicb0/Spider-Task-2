@@ -15,8 +15,12 @@ You are on a space exploration mission to find other life forms in the universe.
 - [x] Think about how you can add bonuses or special levels to the game and how will be the scoring for such levels.
 
 ## Additional Features:
-- [x] Powerups - Diamonds to increase gun strength, collectable coins.
+- [x] Spaceship Health - Colliding with Enemies reduces your health. Collect Health Portions to increase your health.
+- [x] Powerups - Diamonds to increase gun strength, Health Portions to increase the health of the spaceship, collectable coins.
+- [x] Special Levels - Helps to boost your score, the aliens have thier own health bars. 
+- [x] Gun Strength - The number of bullets released from the gun at a time is decided by your gun strength. As the level increses, you'll bydefault get higher gun strength.  
 - [x] Info Button which brief about the game and all the Enemies and Powerups of the game.
+- [x] Bonus points are shown to make the game look attractive.
 - [x] Background Music and Sound Effects and the switch to mute or unmute them.
 - [x] Responsive Game using media Queries.
 
