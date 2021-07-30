@@ -75,6 +75,7 @@ var bullets = []
 var enemies = []
 var powerups = []
 var particles = []
+var bonusPoints = []
 
 var nameDisplay;
 var requestID;
@@ -203,7 +204,7 @@ class DrawPowerup {
     }
 }
 
-class Particle {
+class DrawParticle {
     constructor(x, y, radius, speedX, speedY, particleAlpha) {
         this.x = x
         this.y = y
@@ -223,6 +224,31 @@ class Particle {
         this.draw();
         this.x += this.speedX;
         this.y += this.speedY;
+        this.particleAlpha -= 0.01
+        if (this.particleAlpha < 0) {
+            this.particleAlpha = 0
+        }
+        this.color = `rgba(223, 225, 247, ${this.particleAlpha})`
+    }
+}
+
+class DrawBonus {
+    constructor(x, y, speed, particleAlpha, message) {
+        this.x = x
+        this.y = y
+        this.speed = speed
+        this.particleAlpha = particleAlpha
+        this.message = message
+    }
+    draw() {
+        ctx.font = "10px Arial";
+        ctx.fillStyle = `rgba(223, 225, 247, ${this.particleAlpha})`;
+        ctx.textAlign = "center";
+        ctx.fillText(this.message, this.x, this.y);
+    }
+    update() {
+        this.draw();
+        this.y -= this.speed;
         this.particleAlpha -= 0.01
         if (this.particleAlpha < 0) {
             this.particleAlpha = 0
@@ -277,6 +303,15 @@ function update() {
         }
     })
 
+    bonusPoints.forEach((bonus, index) => {
+        bonus.update();
+
+        // removing the bonusPoints once they fade out
+        if (bonus.particleAlpha == 0) {
+            bonusPoints.splice(index, 1);
+        }
+    })
+
     // scoring
     count++;
     score = Math.floor(count / 20)
@@ -311,24 +346,12 @@ function spawnEnemy() {
                 levelUpSound.play();
                 count += 200
                 level++
+                bonusPoints.push(new DrawBonus(canvas.width / 2, canvas.height / 2, 1, 1, '+10 - Level Advanced'))
                 levelDisplay.innerHTML = "Level - " + level
                 levelCanvas.innerHTML = "Level - " + level
                 levelCanvas.classList.remove("hide")
                 totalEnemies = 0;
                 intervalID1 = setInterval(enemyFunc, 1000 + 1000 * level)
-
-                // gun strength higher at higher levels
-                if (level == 4 || level == 5 || level == 6) {
-                    if (gunStrength == 1) {
-                        gunStrength = 2
-                        spaceshipSize = 85
-                    }
-                } else if (level > 6) {
-                    if (gunStrength == 2) {
-                        gunStrength = 3
-                        spaceshipSize = 95
-                    }
-                }
 
                 timeoutID1 = setTimeout(() => {
                     levelCanvas.classList.add("hide")
@@ -347,6 +370,23 @@ function spawnEnemy() {
 }
 
 function spawnBullet() {
+        // gun strength higher at higher levels
+        if (gunStrength < 1) {
+            gunStrength = 1
+            spaceshipSize = 75
+        }
+        if (level == 4 || level == 5 || level == 6) {
+            if (gunStrength < 2) {
+                gunStrength = 2
+                spaceshipSize = 85
+            }
+        } else if (level > 6) {
+            if (gunStrength < 3) {
+                gunStrength = 3
+                spaceshipSize = 95
+            }
+        }
+
     shootSound.play();
     bulletLeft = spaceshipLeft + spaceshipSize;
     bulletTop = spaceshipTop + spaceshipSize / 2 - bulletHeight / 2;
@@ -481,7 +521,7 @@ function enemyBulletCollision() {
                         // burst effect
                         for (let i = 0; i < 15; i++) {
                             particleAlpha = 1
-                            particles.push(new Particle(bullet.x + bulletWidth, bullet.y + bulletHeight / 2, 3, Math.random() - 0.5, Math.random() - 0.5, particleAlpha))
+                            particles.push(new DrawParticle(bullet.x + bulletWidth, bullet.y + bulletHeight / 2, 3, Math.random() - 0.5, Math.random() - 0.5, particleAlpha))
                         }
 
                         // spawning powerups - randomly
@@ -492,11 +532,14 @@ function enemyBulletCollision() {
                         // incleasing kills
                         kills++
                         count += 100
+                        bonusPoints.push(new DrawBonus(enemy.x + enemySize / 2, enemy.y, 1, 1, '+5'))
                         killDisplay.innerHTML = "Kills - " + kills
                         enemies.splice(i, 1)
                         bullets.splice(j, 1)
                     } else if (enemy.strength > 1) {
                         enemy.strength -= 1
+                        count += 20
+                        bonusPoints.push(new DrawBonus(enemy.x + enemySize / 2, enemy.y, 1, 1, '+1'))
                         bullets.splice(j, 1)
                     }
                 }, 0)
@@ -523,6 +566,7 @@ function powerupPlayerCollision() {
                 coins++;
                 coinsDisplay.innerHTML = coins;
                 count += 100
+                bonusPoints.push(new DrawBonus(powerup.x, powerup.y + powerupSize / 2, 1, 1, '+5'))
                 coinSound.play();
                 powerups.splice(index, 1)
             } else if (powerup.id == 'diamond') {
